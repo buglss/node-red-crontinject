@@ -28,6 +28,6 @@
   },
   "dependencies": {
     "cronosjs": "^1.7.1",
-    "cronti": "^3.0.3"
+    "cronti": "^3.0.4"
   }
 }

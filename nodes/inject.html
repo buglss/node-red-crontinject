@@ -81,7 +81,7 @@
         <select id="inject-time-cronti-on-interval-time-units">
             <option value=""></option>
             <option value="m" >minutes</option>
-            <option value="h" >seconds</option>
+            <option value="h" >hours</option>
             <option value="d" >days</option>
         </select>
         <input id="inject-time-cronti-on-interval-time-count" class="inject-time-count" value="1"></input>
@@ -575,7 +575,7 @@
                     (crontiArgsInputId[crontiMethod] || []).forEach(function(input, i) {
                         checkboxInput[input]
                             ? $("#" + input).prop("checked", crontiArgs[i])
-                            : $("#" + input).val(crontiArgs[i].replace(/(M)|(W)|(WD)|(FD)|(d)|(h)|(m)/g, ""));
+                            : $("#" + input).val(crontiArgs[i].replace(/^[0-9]+((M)|(W)|(WD)|(FD)|(d)|(h)|(m))$/g, function(text) { return text.replace(/(M)|(W)|(WD)|(FD)|(d)|(h)|(m)/, "") }));
                     });
                 }
                 // Cronti End
