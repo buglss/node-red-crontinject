@@ -1,0 +1,33 @@
+{
+  "name": "node-red-clone-inject-with-cronti",
+  "version": "0.0.1",
+  "description": "It is an extended clone of core inject node with cronti package.",
+  "author": {
+    "name": "Levent Sencer Şahin",
+    "email": "l.sencer.sahin@gmail.com",
+    "url": "https://buglss.github.io"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "./test/node_modules/node-red/red.js -u ./test/",
+    "build": "mkdir -p ./test/ && npm --prefix ./test/ i . && npm --prefix ./test/ i node-red"
+  },
+  "node-red": {
+    "nodes": {
+      "injectclone": "nodes/inject.js"
+    }
+  },
+  "keywords": [
+    "node-red-inject",
+    "core-inject-node",
+    "node-red-inject-with-cronti"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/buglss/node-red-clone-inject-with-cronti.git"
+  },
+  "dependencies": {
+    "cronosjs": "^1.7.1",
+    "cronti": "^3.0.1"
+  }
+}
