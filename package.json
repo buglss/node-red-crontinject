@@ -1,6 +1,6 @@
 {
   "name": "node-red-clone-inject-with-cronti",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "It is an extended clone of core inject node with cronti package.",
   "author": {
     "name": "Levent Sencer Şahin",
