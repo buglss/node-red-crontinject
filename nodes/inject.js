@@ -100,20 +100,23 @@ module.exports = function(RED) {
                 let crontime = handleCrontabWithCronti(this.crontiMethod, ...JSON.parse(this.crontiArgs))
                 this.cronjob = scheduleTask(crontime, () => { 
                     if(this.crontiMethod === "onIntervalTime") {
+                        let startDate = new Date(JSON.parse(this.crontiArgs)[0])
                         let endDate = new Date(JSON.parse(this.crontiArgs)[1])
                         if(new Date() >= endDate) {
                             this.cronjob.stop();
                             delete this.cronjob;
                             return
+                        } else if(new Date <= startDate) {
+                            return
                         }
                     }
                     node.emit("input", {}) 
                 });
-                let endText = ""
+                let dateText = ""
                 if(this.crontiMethod === "onIntervalTime") {
-                    endText = "End:" + new Date(JSON.parse(this.crontiArgs)[1]).toISOString()
+                    dateText = "ST:" + new Date(JSON.parse(this.crontiArgs)[0]).toISOString() + " | ET:" + new Date(JSON.parse(this.crontiArgs)[1]).toISOString()
                 }
-                this.status({fill:"green",shape:"dot",text:crontime+" "+endText});
+                this.status({fill:"green",shape:"dot",text:crontime+" | "+dateText});
             }
         };
 
