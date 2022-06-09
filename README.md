@@ -8,7 +8,7 @@ Node-Red Forum: [https://discourse.nodered.org/t/inject-node-with-cronti/63438](
 
 Node-Red Pull Request: [https://github.com/node-red/node-red/pull/3636](https://github.com/node-red/node-red/pull/3636)
 
-![inject-node-with-cronti-new-min](https://user-images.githubusercontent.com/16067517/172557114-69045137-d0da-4892-ac6f-ac670bb7c155.gif)
+![inject-node-with-cronti-new-fix-1-min](https://user-images.githubusercontent.com/16067517/172713909-c95ac496-bbb2-43b1-8bcf-e699ffd27c93.gif)
 
 # Install
 
