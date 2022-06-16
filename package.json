@@ -1,5 +1,5 @@
 {
-  "name": "@buglss/nrc-crontinject",
+  "name": "@buglss/node-red-crontinject",
   "version": "1.0.14",
   "description": "It is an extended clone of core inject node with cronti package.",
   "author": {
