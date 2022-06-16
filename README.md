@@ -13,5 +13,5 @@ Node-Red Pull Request: [https://github.com/node-red/node-red/pull/3636](https://
 # Install
 
 ```js
-npm i https://github.com/buglss/node-red-clone-inject-with-cronti.git
+npm i @buglss/node-red-crontinject
 ```
