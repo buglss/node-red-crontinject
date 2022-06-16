@@ -20,7 +20,8 @@
   "keywords": [
     "node-red-inject",
     "core-inject-node",
-    "node-red-inject-with-cronti"
+    "node-red-inject-with-cronti",
+    "node-red"
   ],
   "repository": {
     "type": "git",
