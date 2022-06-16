@@ -16,13 +16,13 @@
 
 module.exports = function(RED) {
     "use strict";
-    const { scheduleTask } = require("cronosjs");
+    const { scheduleTask, CronosExpression } = require("cronosjs");
     const cronti = require("cronti");
 
-    function handleCrontabWithCronti(method, ...args) {
+    function handleCrontabWithCronti(node, method, ...args) {
         let crontime = cronti(method, ...args)
 
-        if(!crontime) node.error(RED._("inject.errors.invalid-crontime", { error: method }));
+        if(!crontime) node && node.error("Invalid argument for Crontime expression of method: " + method);
         else return crontime
     }
 
@@ -71,34 +71,34 @@ module.exports = function(RED) {
                     prop.exp = RED.util.prepareJSONataExpression(val, node);
                 }
                 catch(err) {
-                    node.error(RED._("inject.errors.invalid-expr", { error: err.message }));
+                    node.error("Invalid JSONata expression: " + err.message);
                     prop.exp = null;
                 }
             }
         });
 
         if(node.repeat > 2147483) {
-            node.error(RED._("inject.errors.toolong", this));
+            node.error("Interval too large");
             delete node.repeat;
         }
 
         node.repeaterSetup = function() {
-            this.status({fill:"green",shape:"dot",text:"None"});
-            if (this.repeat && !isNaN(this.repeat) && this.repeat > 0) {
+            this.status({ fill: "green", shape: "dot", text: "None" });
+            if(this.repeat && !isNaN(this.repeat) && this.repeat > 0) {
                 this.repeat = this.repeat * 1000;
-                this.debug(RED._("inject.repeat", this));
+                this.debug("repeat = " + this.repeat);
                 this.interval_id = setInterval(function() {
                     node.emit("input", {});
                 }, this.repeat);
-                this.status({fill:"green",shape:"dot",text:this.repeat});
-            } else if (this.crontab) {
-                this.debug(RED._("inject.crontab", this));
-                this.cronjob = scheduleTask(this.crontab,() => { node.emit("input", {})});
-                this.status({fill:"green",shape:"dot",text:this.crontab});
-            } else if (this.crontiMethod) {
-                this.debug(RED._("inject.crontab", this));
-                let crontime = handleCrontabWithCronti(this.crontiMethod, ...JSON.parse(this.crontiArgs))
-                this.cronjob = scheduleTask(crontime, () => { 
+                this.status({ fill: "green", shape: "dot", text: this.repeat });
+            } else if(this.crontab) {
+                this.debug("crontab = " + this.crontab);
+                this.cronjob = scheduleTask(this.crontab, () => { node.emit("input", {}) });
+                this.status({ fill: "green", shape: "dot", text: this.crontab });
+            } else if(this.crontiMethod) {
+                let crontime = handleCrontabWithCronti(this, this.crontiMethod, ...JSON.parse(this.crontiArgs))
+                this.debug("crontab = " + this.crontime);
+                this.cronjob = scheduleTask(crontime, () => {
                     if(this.crontiMethod === "onIntervalTime") {
                         let startDate = new Date(JSON.parse(this.crontiArgs)[0])
                         let endDate = new Date(JSON.parse(this.crontiArgs)[1])
@@ -110,13 +110,13 @@ module.exports = function(RED) {
                             return
                         }
                     }
-                    node.emit("input", {}) 
+                    node.emit("input", {})
                 });
                 let dateText = ""
                 if(this.crontiMethod === "onIntervalTime") {
-                    dateText = "ST:" + new Date(JSON.parse(this.crontiArgs)[0]).toISOString() + " | ET:" + new Date(JSON.parse(this.crontiArgs)[1]).toISOString()
+                    dateText = "ST:" + new Date(JSON.parse(this.crontiArgs)[0]).toLocaleString() + " | ET:" + new Date(JSON.parse(this.crontiArgs)[1]).toLocaleString()
                 }
-                this.status({fill:"green",shape:"dot",text:crontime+" | "+dateText});
+                this.status({ fill: "green", shape: "dot", text: crontime + (dateText ? (" | " + dateText) : "") });
             }
         };
 
@@ -171,7 +171,7 @@ module.exports = function(RED) {
         });
     }
 
-    RED.nodes.registerType("injectclone", InjectNode);
+    RED.nodes.registerType("crontinject", InjectNode);
 
     InjectNode.prototype.close = function() {
         if(this.onceTimeout) {
@@ -197,10 +197,33 @@ module.exports = function(RED) {
                 res.sendStatus(200);
             } catch(err) {
                 res.sendStatus(500);
-                node.error(RED._("inject.failed", { error: err.toString() }));
+                node.error("Inject failed: " + err.toString());
             }
         } else {
             res.sendStatus(404);
+        }
+    });
+
+    RED.httpAdmin.post("/cronti/next-dates", RED.auth.needsPermission("inject.write"), function(req, res) {
+        const { method, args } = req.body
+        if(!method) {
+            res.status(400).json({ error: "Method is required." })
+            return
+        }
+
+        try {
+            let crontime = handleCrontabWithCronti(null, method, ...args)
+
+            if(!crontime) {
+                res.status(400).json({ error: "Invalid arguments." })
+                return
+            }
+
+            let nextDates = CronosExpression.parse(crontime).nextNDates()
+
+            res.status(200).json({ nextDates })
+        } catch(error) {
+            res.status(500).json({ error: "[" + error.stack + "]: " + error.message })
         }
     });
 }

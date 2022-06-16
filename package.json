@@ -1,5 +1,5 @@
 {
-  "name": "node-red-clone-inject-with-cronti",
+  "name": "nrc-crontinject",
   "version": "1.0.13",
   "description": "It is an extended clone of core inject node with cronti package.",
   "author": {
@@ -14,7 +14,7 @@
   },
   "node-red": {
     "nodes": {
-      "injectclone": "nodes/inject.js"
+      "crontinject": "nodes/inject.js"
     }
   },
   "keywords": [

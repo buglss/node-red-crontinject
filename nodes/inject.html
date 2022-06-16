@@ -14,7 +14,7 @@
   limitations under the License.
 -->
 
-<script type="text/html" data-template-name="injectclone">
+<script type="text/html" data-template-name="crontinject">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> <span >Name</span></label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -229,6 +229,12 @@
         </div>
     </div>
 
+    <!-- Cronti Begin -->
+    <div class="form-row red-ui-editableList-border red-ui-editableList-container" id="crontiMonitor" style="display:none; margin-left: 110px;">
+        <div id="loading"></div>
+        <!-- Dynamic Content -->
+    </div>
+    <!-- Cronti End -->
 </script>
 <style>
     .inject-time-row {
@@ -303,11 +309,117 @@
         padding-right: 12px;
         width: calc(100% - 30px) !important;
     }
+
+    #loading {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        text-align: center;
+        border: 3px solid rgba(000, 000, 000, .3);
+        border-radius: 50%;
+        border-top-color: #000;
+        margin-left: calc(50% - 24px);
+        animation: spin 1s ease-in-out infinite;
+        -webkit-animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @-webkit-keyframes spin {
+        to {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    .cronti-header {
+        margin: 0;
+        background: #ddd;
+        padding: 5px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    .cronti-cron--dates {
+        list-style: none;
+        border-left: 15px solid #ddd;
+        margin-left: 0 !important;
+        border-bottom-left-radius: 5px;
+    }
+
+    .cronti-cron--dates li {
+        padding-left: 5px;
+    }
 </style>
 
 <script type="text/javascript">
     (function() {
+        function isReady(method) {
+            let bool = false;
+            switch(method) {
+                case "onWeek":
+                    bool = $("#inject-time-cronti-on-week-date").val();
+                    break;
+                case "onIntervalTime":
+                    bool = $("#inject-time-cronti-on-interval-time-start-date").val()
+                        && $("#inject-time-cronti-on-interval-time-end-date").val();
+                    break;
+                case "onTime":
+                    bool = true;
+                    break;
+                case "onCrontime":
+                    bool = $("#inject-time-cronti-on-crontime").val();
+                    break;
+                case "onDate":
+                    bool = $("#inject-time-cronti-on-date").val();
+                    break;
+            }
+            return bool;
+        }
 
+        function getCrontiArgs(method) {
+            var args = [];
+            switch(method) {
+                case "onWeek":
+                    args = [
+                        $("#inject-time-cronti-on-week-first-day-of-week").val() + "FD",
+                        $("#inject-time-cronti-on-week-date").val()
+                    ];
+                    break;
+                case "onIntervalTime":
+                    args = [
+                        $("#inject-time-cronti-on-interval-time-start-date").val(),
+                        $("#inject-time-cronti-on-interval-time-end-date").val(),
+                        $("#inject-time-cronti-on-interval-time-count").val() + $("#inject-time-cronti-on-interval-time-units").val(),
+                        $("#inject-time-cronti-on-interval-time-units").val() // used in input set value
+                    ];
+                    break;
+                case "onTime":
+                    args = [
+                        $("#inject-time-cronti-on-time-first-day-of-week").val() + "FD",
+                        $("#inject-time-cronti-on-time-month").val() + "M",
+                        $("#inject-time-cronti-on-time-week").val() + "W",
+                        $("#inject-time-cronti-on-time-weekdays").val() + "WD",
+                        $("#inject-time-cronti-on-time-time").val()
+                    ];
+                    break;
+                case "onCrontime":
+                    args = [
+                        $("#inject-time-cronti-on-crontime").val()
+                    ];
+                    break;
+                case "onDate":
+                    args = [
+                        $("#inject-time-cronti-on-date").val(),
+                        $("#inject-time-cronti-on-date-isMonthOfDate").prop("checked")
+                    ];
+                    break;
+            }
+            return args;
+        }
         function resizeDialog(size) {
             size = size || { height: $(".red-ui-tray-content form").height() }
             var rows = $("#dialog-form>div:not(.node-input-property-container-row):visible");
@@ -362,24 +474,24 @@
                 data: JSON.stringify(customMsg || {}),
                 contentType: "application/json; charset=utf-8",
                 success: function(resp) {
-                    RED.notify(node._("inject.success", { label: label }), { type: "success", id: "inject", timeout: 2000 });
+                    RED.notify("Successfully injected: " + label, { type: "success", id: "inject", timeout: 2000 });
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     if(jqXHR.status == 404) {
-                        RED.notify(node._("common.notification.error", { message: node._("common.notification.errors.not-deployed") }), "error");
+                        RED.notify(node._("common.notification.error", { message: "node not deployed" }), "error");
                     } else if(jqXHR.status == 500) {
-                        RED.notify(node._("common.notification.error", { message: node._("inject.errors.failed") }), "error");
+                        RED.notify(node._("common.notification.error", { message: "inject failed, see log for details" }), "error");
                     } else if(jqXHR.status == 0) {
-                        RED.notify(node._("common.notification.error", { message: node._("common.notification.errors.no-response") }), "error");
+                        RED.notify(node._("common.notification.error", { message: "no response from server" }), "error");
                     } else {
-                        RED.notify(node._("common.notification.error", { message: node._("common.notification.errors.unexpected", { status: jqXHR.status, message: textStatus }) }), "error");
+                        RED.notify(node._("common.notification.error", { message: "unexpected error " + (jqXHR.status) + " " + textStatus + " " }), "error");
                     }
                 }
             });
         }
-        RED.nodes.registerType("injectclone", {
+        RED.nodes.registerType("crontinject", {
             category: 'common',
-            color: "#a6bbcf",
+            color: "#97c8eb",
             defaults: {
                 name: { value: "" },
                 props: {
@@ -388,21 +500,21 @@
                         for(var i = 0; i < v.length; i++) {
                             if(/msg|flow|global/.test(v[i].vt)) {
                                 if(!RED.utils.validatePropertyExpression(v[i].v)) {
-                                    return RED._("node-red:inject.errors.invalid-prop", { prop: 'msg.' + v[i].p, error: v[i].v });
+                                    return "msg." + v[i].p + ": invalid property expression: " + v[i].v;
                                 }
                             } else if(v[i].vt === "jsonata") {
                                 try { jsonata(v[i].v); }
                                 catch(e) {
-                                    return RED._("node-red:inject.errors.invalid-jsonata", { prop: 'msg.' + v[i].p, error: e.message });
+                                    return "msg." + v[i].p + ": invalid property expression: " + e.message
                                 }
                             } else if(v[i].vt === "json") {
                                 try { JSON.parse(v[i].v); }
                                 catch(e) {
-                                    return RED._("node-red:inject.errors.invalid-json", { prop: 'msg.' + v[i].p, error: e.message });
+                                    return "msg." + v[i].p + ": invalid JSON data: " + e.message
                                 }
                             } else if(v[i].vt === "num") {
                                 if(!/^[+-]?[0-9]*\.?[0-9]*([eE][-+]?[0-9]+)?$/.test(v[i].v)) {
-                                    return RED._("node-red:inject.errors.invalid-prop", { prop: 'msg.' + v[i].p, error: v[i].v });
+                                    return "msg." + v[i].p + ": invalid property expression: " + v[i].v;
                                 }
                             }
                         }
@@ -416,7 +528,7 @@
                                 (v >= 0) && (v <= 2147483))) {
                             return true;
                         }
-                        return RED._("node-red:inject.errors.invalid-repeat");
+                        return "Invalid repeat value";
                     }
                 },
                 crontab: { value: "" },
@@ -467,7 +579,26 @@
                                 propType = "invalid";
                             }
                         }
-                        lab += this._("inject.label." + propType);
+                        var labelLookup = {
+                            "properties": "Properties",
+                            "repeat": "Repeat",
+                            "flow": "flow context",
+                            "global": "global context",
+                            "str": "string",
+                            "num": "number",
+                            "bool": "boolean",
+                            "json": "object",
+                            "bin": "buffer",
+                            "date": "timestamp",
+                            "env": "env variable",
+                            "object": "object",
+                            "string": "string",
+                            "boolean": "boolean",
+                            "number": "number",
+                            "Array": "array",
+                            "invalid": "Invalid JSON Object"
+                        }
+                        lab += labelLookup[propType];
                     }
                 }
                 return lab;
@@ -502,6 +633,25 @@
                     payloadType = this.payloadType || "str";
                     topic = this.topic || "";
                 }
+                var labelLookup = {
+                    "properties": "Properties",
+                    "repeat": "Repeat",
+                    "flow": "flow context",
+                    "global": "global context",
+                    "str": "string",
+                    "num": "number",
+                    "bool": "boolean",
+                    "json": "object",
+                    "bin": "buffer",
+                    "date": "timestamp",
+                    "env": "env variable",
+                    "object": "object",
+                    "string": "string",
+                    "boolean": "boolean",
+                    "number": "number",
+                    "Array": "array",
+                    "invalid": "Invalid JSON Object"
+                }
                 if(payloadType === "string" ||
                     payloadType === "str" ||
                     payloadType === "num" ||
@@ -512,19 +662,19 @@
                     } else if(payload.length > 0 && payload.length < 24) {
                         return payload + suffix;
                     } else {
-                        return this._("inject.inject") + suffix;
+                        return "inject" + suffix;
                     }
                 } else if(payloadType === 'date' || payloadType === 'bin' || payloadType === 'env') {
                     if((topic !== "") && (topic.length <= 16)) {
-                        return topic + ":" + this._('inject.label.' + payloadType) + suffix;
+                        return topic + ":" + labelLookup[payloadType] + suffix;
                     } else {
-                        return this._('inject.label.' + payloadType) + suffix;
+                        return labelLookup[payloadType] + suffix;
                     }
                 } else if(payloadType === 'flow' || payloadType === 'global') {
                     var key = RED.utils.parseContextKey(payload);
                     return payloadType + "." + key.key + suffix;
                 } else {
-                    return this._("inject.inject") + suffix;
+                    return "inject" + suffix;
                 }
             },
             labelStyle: function() {
@@ -533,6 +683,11 @@
             oneditprepare: function() {
                 var node = this;
                 var payloadType = node.payloadType;
+                var type = $("#inject-time-type-select").val();
+                var isCronti = type.includes("cronti")
+                var crontiMonitor = $("#crontiMonitor")
+
+                isCronti ? crontiMonitor.show() : crontiMonitor.hide()
 
                 if(node.payloadType == null) {
                     if(node.payload == "") {
@@ -542,6 +697,41 @@
                     }
                 } else if(node.payloadType === 'string' || node.payloadType === 'none') {
                     payloadType = "str";
+                }
+
+                var delayTimer
+                function crontiMonitFunc() {
+                    var type = $("#inject-time-type-select").val();
+                    var isCronti = type.includes("cronti")
+                    if(!isCronti) return
+
+                    var method = type.replace("cronti-", "").split("-").map((x, i) => i ? x[0].toUpperCase() + x.substr(1) : x).join("");
+                    var args = getCrontiArgs(method)
+                    crontiMonitor.show()
+                    clearTimeout(delayTimer);
+                    if(isReady(method)) {
+                        crontiMonitor.html('<div id="loading"></div>')
+                        delayTimer = setTimeout(function() {
+                            $.ajax({
+                                url: "/cronti/next-dates",
+                                data: JSON.stringify({ method, args }),
+                                method: "POST",
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json"
+                            }).done(function(res, textStatus, xhr) {
+                                if(xhr.status !== 200) {
+                                    crontiMonitor.html("<div><strong>Error: </strong>" + res.error + "</div>")
+                                    return
+                                }
+
+                                crontiMonitor.html("<h4 class='cronti-header'>Next 5 Dates for '" + method + "'</h4><ul class='cronti-cron--dates'>" + res.nextDates.reduce(function(acc, curr) { var date = new Date(curr); var endDate; if(method === "onIntervalTime") { endDate = new Date(args[1]) }; return acc += (!endDate || date <= endDate) ? ("<li>" + date.toLocaleString() + "</li>") : "" }, "") + "</ul>")
+                            }).fail(function(xhr, textStatus, err) {
+                                crontiMonitor.html("<div><strong>Error: </strong>" + xhr.responseJSON.error + "</div>")
+                            })
+                        }, 300);
+                    } else {
+                        crontiMonitor.html('<div>Parameter Waiting...</div>')
+                    }
                 }
 
                 $("#inject-time-type-select").on("change", function() {
@@ -556,6 +746,11 @@
                     var scrollDiv = $("#dialog-form").parent();
                     scrollDiv.scrollTop(scrollDiv.prop('scrollHeight'));
                     resizeDialog();
+
+                    // Cronti
+                    var isCronti = id.includes("cronti")
+                    if(isCronti) crontiMonitFunc()
+                    else crontiMonitor.hide()
                 });
 
                 // Cronti Begin
@@ -566,6 +761,7 @@
                 var crontiMethod = $("#node-input-crontiMethod").val();
                 var crontiArgs = JSON.parse($("#node-input-crontiArgs").val());
                 if(crontiMethod && crontiArgs.length) {
+                    crontiMonitor.show()
                     var crontiArgsInputId = {
                         "onWeek": ["inject-time-cronti-on-week-first-day-of-week", "inject-time-cronti-on-week-date"],
                         "onIntervalTime": ["inject-time-cronti-on-interval-time-start-date", "inject-time-cronti-on-interval-time-end-date", "inject-time-cronti-on-interval-time-count", "inject-time-cronti-on-interval-time-units"],
@@ -582,6 +778,8 @@
                             : $("#" + input).val(crontiArgs[i].replace(/^-?[0-9]+((M)|(WD?)|(W?D)|(FD)|(d)|(h)|(m))$/g, function(text) { return text.replace(/(M)|(WD?)|(W?D)|(FD)|(d)|(h)|(m)/, "") }));
                     });
                 }
+
+                $("input[id*='cronti'], select[id*='cronti']").on("change spinchange", crontiMonitFunc)
                 // Cronti End
 
                 $("#node-input-once").on("change", function() {
@@ -709,7 +907,7 @@
                     buttons: [
                         {
                             id: "node-inject-test-inject-button",
-                            label: node._("inject.injectNow"),
+                            label: "inject now",
                             click: function(e) {
                                 var items = eList.editableList('items');
                                 var props = getProps(items);
@@ -903,43 +1101,7 @@
                 // Cronti Begin
                 if(isCronti) {
                     var method = type.replace("cronti-", "").split("-").map((x, i) => i ? x[0].toUpperCase() + x.substr(1) : x).join("");
-                    var args = [];
-                    switch(method) {
-                        case "onWeek":
-                            args = [
-                                $("#inject-time-cronti-on-week-first-day-of-week").val() + "FD",
-                                $("#inject-time-cronti-on-week-date").val()
-                            ];
-                            break;
-                        case "onIntervalTime":
-                            args = [
-                                $("#inject-time-cronti-on-interval-time-start-date").val(),
-                                $("#inject-time-cronti-on-interval-time-end-date").val(),
-                                $("#inject-time-cronti-on-interval-time-count").val() + $("#inject-time-cronti-on-interval-time-units").val(),
-                                $("#inject-time-cronti-on-interval-time-units").val() // used in input set value
-                            ];
-                            break;
-                        case "onTime":
-                            args = [
-                                $("#inject-time-cronti-on-time-first-day-of-week").val() + "FD",
-                                $("#inject-time-cronti-on-time-month").val() + "M",
-                                $("#inject-time-cronti-on-time-week").val() + "W",
-                                $("#inject-time-cronti-on-time-weekdays").val() + "WD",
-                                $("#inject-time-cronti-on-time-time").val()
-                            ];
-                            break;
-                        case "onCrontime":
-                            args = [
-                                $("#inject-time-cronti-on-crontime").val()
-                            ];
-                            break;
-                        case "onDate":
-                            args = [
-                                $("#inject-time-cronti-on-date").val(),
-                                $("#inject-time-cronti-on-date-isMonthOfDate").prop("checked")
-                            ];
-                            break;
-                    }
+                    var args = getCrontiArgs(method)
                     $("#node-input-crontiMethod").val(method);
                     $("#node-input-crontiArgs").val(JSON.stringify(args));
                 }
@@ -962,7 +1124,7 @@
     })();
 </script>
 
-<script type="text/html" data-help-name="injectclone">
+<script type="text/html" data-help-name="crontinject">
     <p>Injects a message into a flow either manually or at regular intervals. The message
     payload can be a variety of types, including strings, JavaScript objects or the current time.</p>
     <h3>Outputs</h3>
@@ -986,5 +1148,5 @@
     If you want every 20 minutes from now - use the <i>"interval"</i> option.</p>
     <p><b>Note</b>: To include a newline in a string you must use a Function node to create the payload.</p>
     <hr/>
-    <p>"week of date", "intervals to dates", "advanced", "crontime" and "date" features are prepared using <a href="https://www.npmjs.com/package/cronti" target="_blank">the cronti package</a>. Click on the cronti <a href="https://buglss.github.io/npm/cronti/v2/" target="_blank">link</a> for detailed information.</p>
+    <p>"week of date", "intervals to dates", "advanced", "crontime" and "date" features are prepared using <a href="https://www.npmjs.com/package/cronti" target="_blank">the cronti package</a>. Click on the cronti <a href="https://buglss.github.io/npm/cronti/" target="_blank">link</a> for detailed information.</p>
     </script>
