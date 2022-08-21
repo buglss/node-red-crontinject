@@ -1,6 +1,6 @@
 {
   "name": "@buglss/node-red-crontinject",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "It is an extended clone of core inject node with cronti package.",
   "author": {
     "name": "Levent Sencer Şahin",
