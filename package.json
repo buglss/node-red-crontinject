@@ -28,7 +28,6 @@
     "url": "https://github.com/buglss/node-red-clone-inject-with-cronti.git"
   },
   "dependencies": {
-    "cronosjs": "^1.7.1",
-    "cronti": "^3.0.8"
+    "cronjo": "^1.0.0"
   }
 }

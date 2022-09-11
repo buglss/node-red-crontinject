@@ -711,7 +711,7 @@
                         crontiMonitor.html('<div id="loading"></div>')
                         delayTimer = setTimeout(function() {
                             $.ajax({
-                                url: "/cronti/next-dates",
+                                url: "/cronjo/next-dates",
                                 data: JSON.stringify({ method, args }),
                                 method: "POST",
                                 contentType: "application/json; charset=utf-8",
@@ -721,7 +721,6 @@
                                     crontiMonitor.html("<div><strong>Error: </strong>" + res.error + "</div>")
                                     return
                                 }
-
                                 crontiMonitor.html("<h4 class='cronti-header'>Next 5 Dates for '" + method + "'</h4><ul class='cronti-cron--dates'>" + res.nextDates.reduce(function(acc, curr) { var date = new Date(curr); var endDate; if(method === "onIntervalTime") { endDate = new Date(args[1]) }; return acc += (!endDate || date <= endDate) ? ("<li>" + date.toLocaleString() + "</li>") : "" }, "") + "</ul>")
                             }).fail(function(xhr, textStatus, err) {
                                 crontiMonitor.html("<div><strong>Error: </strong>" + xhr.responseJSON.error + "</div>")
