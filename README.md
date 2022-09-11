@@ -2,7 +2,7 @@
 
 It is an extended clone of core inject node with cronti package.
 
-Try this version of core inject node with cronti.
+Try this version of core inject node with cronti. It uses the power of the [cronjo](https://www.npmjs.com/package/cronjo) package.
 
 Node-Red Forum: [https://discourse.nodered.org/t/inject-node-with-cronti/63438](https://discourse.nodered.org/t/inject-node-with-cronti/63438)
 
