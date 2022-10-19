@@ -42,6 +42,7 @@
             <option value="cronti-on-time" >advanced</option>
             <option value="cronti-on-crontime" >crontime</option>
             <option value="cronti-on-date" >date</option>
+            <option value="msg" >msg</option>
         </select>
         <input type="hidden" id="node-input-repeat">
         <input type="hidden" id="node-input-crontab">
@@ -536,7 +537,9 @@
                 payload: { value: "", validate: RED.validators.typedInput("payloadType", false) },
                 payloadType: { value: "date" },
                 crontiMethod: { value: "" },
-                crontiArgs: { value: "[]" }
+                crontiArgs: { value: "[]" },
+                inputs: { value: 0 },
+                hasButton: { value: true }
             },
             icon: "inject.svg",
             inputs: 0,
@@ -681,11 +684,6 @@
             oneditprepare: function() {
                 var node = this;
                 var payloadType = node.payloadType;
-                var type = $("#inject-time-type-select").val();
-                var isCronti = type.includes("cronti")
-                var crontiMonitor = $("#crontiMonitor")
-
-                isCronti ? crontiMonitor.show() : crontiMonitor.hide()
 
                 if(node.payloadType == null) {
                     if(node.payload == "") {
@@ -693,7 +691,7 @@
                     } else {
                         payloadType = "str";
                     }
-                } else if(node.payloadType === 'string' || node.payloadType === 'none') {
+                } else if(node.payloadType === 'string' || node.payloadType === 'none' || node.payloadType === "msg") {
                     payloadType = "str";
                 }
 
@@ -812,7 +810,9 @@
                 });
 
                 var repeattype = "none";
-                if(node.repeat != "" && node.repeat != 0) {
+                if(node.inputs) {
+                    repeattype = "msg";
+                } else if(node.repeat != "" && node.repeat != 0) {
                     repeattype = "interval";
                     var r = "s";
                     var c = node.repeat;
@@ -896,6 +896,17 @@
                 $("#inject-time-type-select").val(repeattype);
                 $("#inject-time-row-" + repeattype).show();
 
+                var isCronti = repeattype.includes("cronti")
+                var crontiMonitor = $("#crontiMonitor")
+
+                isCronti ? crontiMonitor.show() : crontiMonitor.hide()
+
+                node.inputs = 0
+                node.hasButton = true
+                if(repeattype === "msg") {
+                    node.inputs = 1
+                    node.hasButton = false
+                }
                 /* */
 
                 var eList = $('#node-input-property-container').css('min-height', '120px').css('min-width', '450px');
@@ -988,13 +999,23 @@
 
             },
             oneditsave: function() {
+                var node = this
                 var repeat = "";
                 var crontab = "";
                 var crontiMethod = "";
                 var crontiArgs = "";
                 var type = $("#inject-time-type-select").val();
                 var isCronti = type.includes("cronti")
-                if(type == "none") {
+
+                node.inputs = 0
+                node.hasButton = true
+                if(type === "msg") {
+                    node.inputs = 1
+                    node.hasButton = false
+                }
+                node.inputs = type === "msg" ? 1 : 0
+
+                if(type === "none" || type === "msg") {
                     // nothing
                 } else if(type == "interval") {
                     var count = $("#inject-time-interval-count").val();
@@ -1108,6 +1129,9 @@
             button: {
                 enabled: function() {
                     return !this.changed
+                },
+                visible: function() {
+                    return this.hasButton
                 },
                 onclick: function() {
                     if(this.changed) {
