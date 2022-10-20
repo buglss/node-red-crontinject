@@ -1,0 +1,94 @@
+[
+    {
+        "id": "a5f27d3ad5d2be90",
+        "type": "comment",
+        "z": "7cabc8e221eacc0f",
+        "name": "msg for crontab",
+        "info": "### [EN]\nInject at 1:10 a.m. on October 22 each year.\n\n### [TR]\nHer yıl 22 Ekim'de saat 01:10'da enjeksiyon yap.",
+        "x": 140,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "baad86fb4787450e",
+        "type": "crontinject",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "crontiMethod": "",
+        "crontiArgs": "[]",
+        "inputs": 1,
+        "hasButton": false,
+        "x": 280,
+        "y": 1440,
+        "wires": [
+            [
+                "b9f77a63f68bb33c"
+            ]
+        ]
+    },
+    {
+        "id": "316c83abc534579c",
+        "type": "crontinject",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"crontab\":\"21 1 * * *\"}",
+        "payloadType": "json",
+        "crontiMethod": "",
+        "crontiArgs": "[]",
+        "inputs": 0,
+        "hasButton": true,
+        "x": 110,
+        "y": 1440,
+        "wires": [
+            [
+                "baad86fb4787450e"
+            ]
+        ]
+    },
+    {
+        "id": "b9f77a63f68bb33c",
+        "type": "debug",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 1440,
+        "wires": []
+    }
+]

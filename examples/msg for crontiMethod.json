@@ -1,0 +1,94 @@
+[
+    {
+        "id": "cff9817055f418a0",
+        "type": "comment",
+        "z": "7cabc8e221eacc0f",
+        "name": "msg for crontiMethod",
+        "info": "### [EN]\nInject between the 15th and 25th of April and between the 15th and 25th of May, annually, repeatedly.\n\n### [TR]\nHer yıl tekrarlanacak şekilde, Nisan ayının 15'i ile 25'i arasında ve Mayıs ayının 15'i ile 25'i arasında enjeksiyon yap.",
+        "x": 160,
+        "y": 1520,
+        "wires": []
+    },
+    {
+        "id": "3a3aa22d22020668",
+        "type": "crontinject",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "crontiMethod": "",
+        "crontiArgs": "[]",
+        "inputs": 1,
+        "hasButton": false,
+        "x": 280,
+        "y": 1560,
+        "wires": [
+            [
+                "40f10f044d22d902"
+            ]
+        ]
+    },
+    {
+        "id": "815bcd4aa95d2d09",
+        "type": "crontinject",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"crontiMethod\":\"onIntervalTime\",\"crontiArgs\":[\"2022-04-15T09:30:00.000Z\",\"2022-05-25T09:30:00.000Z\"]}",
+        "payloadType": "json",
+        "crontiMethod": "",
+        "crontiArgs": "[]",
+        "inputs": 0,
+        "hasButton": true,
+        "x": 110,
+        "y": 1560,
+        "wires": [
+            [
+                "3a3aa22d22020668"
+            ]
+        ]
+    },
+    {
+        "id": "40f10f044d22d902",
+        "type": "debug",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 1560,
+        "wires": []
+    }
+]

@@ -14,20 +14,24 @@
   },
   "node-red": {
     "nodes": {
-      "crontinject": "nodes/inject.js"
+      "crontinject": "nodes/crontinject.js"
     }
   },
   "keywords": [
-    "node-red-inject",
-    "core-inject-node",
-    "node-red-inject-with-cronti",
-    "node-red"
+    "inject",
+    "cronti",
+    "node-red",
+    "cronjo",
+    "crontab",
+    "crontime",
+    "repeater",
+    "schedule"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/buglss/node-red-clone-inject-with-cronti.git"
   },
   "dependencies": {
-    "cronjo": "^1.0.0"
+    "cronjo": "^1.0.3"
   }
 }

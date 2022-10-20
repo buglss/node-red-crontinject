@@ -1,0 +1,94 @@
+[
+    {
+        "id": "4744edf87ea6b605",
+        "type": "comment",
+        "z": "7cabc8e221eacc0f",
+        "name": "msg for repeat",
+        "info": "### [EN]\nInject every 10 seconds.\n\n### [TR]\nHer 10 saniyede bir enjekte et.",
+        "x": 130,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "1106aa0f9c0d6301",
+        "type": "crontinject",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "crontiMethod": "",
+        "crontiArgs": "[]",
+        "inputs": 1,
+        "hasButton": false,
+        "x": 280,
+        "y": 1320,
+        "wires": [
+            [
+                "8a076f1a4d692cdd"
+            ]
+        ]
+    },
+    {
+        "id": "041d010fe0412e49",
+        "type": "crontinject",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"repeat\":10}",
+        "payloadType": "json",
+        "crontiMethod": "",
+        "crontiArgs": "[]",
+        "inputs": 0,
+        "hasButton": true,
+        "x": 130,
+        "y": 1320,
+        "wires": [
+            [
+                "1106aa0f9c0d6301"
+            ]
+        ]
+    },
+    {
+        "id": "8a076f1a4d692cdd",
+        "type": "debug",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 1320,
+        "wires": []
+    }
+]

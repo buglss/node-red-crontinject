@@ -1,0 +1,61 @@
+[
+    {
+        "id": "9436b9970ed3284e",
+        "type": "crontinject",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "crontiMethod": "onCrontime",
+        "crontiArgs": "[\"5 4 * * *\"]",
+        "inputs": 0,
+        "hasButton": true,
+        "x": 150,
+        "y": 940,
+        "wires": [
+            [
+                "5ce40ac0c41b9479"
+            ]
+        ]
+    },
+    {
+        "id": "5ce40ac0c41b9479",
+        "type": "debug",
+        "z": "7cabc8e221eacc0f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 350,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "c10fb476843644c2",
+        "type": "comment",
+        "z": "7cabc8e221eacc0f",
+        "name": "Crontime",
+        "info": "### [EN]\nInject daily at 4:05 am.\n\n### [TR]\nHer gün saat 04:05'te enjeksiyon yap.",
+        "x": 140,
+        "y": 900,
+        "wires": []
+    }
+]
