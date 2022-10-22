@@ -84,7 +84,7 @@ module.exports = function(RED) {
             repeaters[node.id] = repeaters[node.id] || []
 
 
-            node.status({ fill: "green", shape: "dot", text: (context.inputs ? "msg" : "none") + " (" + repeaters[node.id].length + ")" });
+            node.status({ fill: "green", shape: "dot", text: (context.inputs ? "msg" : "none") + " (SCNT:" + repeaters[node.id].length + ")" });
             if(context.repeat && !isNaN(context.repeat) && context.repeat > 0) {
                 context.repeat = context.repeat * 1000;
                 node.debug("repeat = " + context.repeat);
@@ -92,12 +92,12 @@ module.exports = function(RED) {
                     node.emit("input", {});
                 }, context.repeat);
                 repeaters[node.id].push({ interval_id: context.interval_id })
-                node.status({ fill: "green", shape: "dot", text: context.repeat + " (" + repeaters[node.id].length + ")" });
+                node.status({ fill: "green", shape: "dot", text: context.repeat + " (SCNT:" + repeaters[node.id].length + ")" });
             } else if(context.crontab) {
                 node.debug("crontab = " + context.crontab);
                 context.cronjob = cronjo(() => { node.emit("input", {}) }, context.crontab)
                 repeaters[node.id].push({ cronjob: context.cronjob })
-                node.status({ fill: "green", shape: "dot", text: context.crontab + " (" + context.cronjob.fireDate().toLocaleString() + ")" + " (" + repeaters[node.id].length + ")" });
+                node.status({ fill: "green", shape: "dot", text: context.crontab + " (" + context.cronjob.fireDate().toLocaleString() + ")" + " (SCNT:" + repeaters[node.id].length + ")" });
             } else if(context.crontiMethod) {
                 try {
                     let crontiArgs = context.crontiArgs
@@ -126,7 +126,7 @@ module.exports = function(RED) {
                     if(context.crontiMethod === "onIntervalTime") {
                         dateText = "ST:" + new Date(crontiArgs[0]).toLocaleString() + " | ET:" + new Date(crontiArgs[1]).toLocaleString()
                     }
-                    node.status({ fill: "green", shape: "dot", text: crontime + " (" + context.cronjob.fireDate().toLocaleString() + ")" + (dateText ? (" | " + dateText) : "") + " (" + repeaters[node.id].length + ")" });
+                    node.status({ fill: "green", shape: "dot", text: crontime + " (" + context.cronjob.fireDate().toLocaleString() + ")" + (dateText ? (" | " + dateText) : "") + " (SCNT:" + repeaters[node.id].length + ")" });
                 } catch(error) {
                     node.error(error, {})
                 }
