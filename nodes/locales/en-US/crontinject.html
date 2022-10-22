@@ -1,0 +1,84 @@
+<!--
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+
+<script type="text/html" data-help-name="crontinject">
+<p>
+    Injects a message manually or on a scheduled basis. The payload field in the message object can be filled in various types.
+    These can be strings, json, or current time.
+    It is recommended to fill at least the payload and topic fields.
+</p>
+<h3>Outputs</h3>
+<dl class="message-properties">
+    <dt>payload<span class="property-type">any</span></dt>
+    <dd>The payload area of the message object (msg).</dd>
+    <dt class="optional">topic <span class="property-type">string</span></dt>
+    <dd>Expressing the subject of the Node. It is the value referred to in points such as the Debug console.</dd>
+</dl>
+<h3>Details</h3>
+<p>
+    A crontinject node can be started with a specific payload.
+    The default payload value is the timestamp of the current time.
+</p>
+<p>
+    The node can output many different types of injection results. These can be string, number, boolean, json or flow/global context.
+</p>
+<p>
+    For manual triggering, the button on (left) of the node is clicked.
+    The options on the node's editor/edit screen are used to schedule triggers.
+</p>
+<p>
+    Flow can also be set to run once every time it starts, for example when "Deploy" is clicked or when the server starts.
+</p>
+<p>
+    When <i>"none"</i> is selected, scheduling is turned off.
+</p>
+<p>
+    The maximum <i>"interval"</i> that can be set is 596 hours (~24 days).
+</p>
+<p>
+    <i>"interval between time"</i>, <i>"at a specific time"</i>, <i>"week of date"</i>, <i>"intervals between dates"</i> i>, <i>"advanced"</i>, <i>"crontime"</i> and <i>"date"</i>
+    values use the standard cron system.
+</p>
+<p>
+    When <i>"msg"</i> is selected, all properties of the node are dynamically set according to the <i>"payload"</i> value in the message object.
+    The value <i>"payload"</i> must be sent as an object.
+</p>
+<h3>Inputs (msg)</h3>
+<dl class="message-properties">
+    <dt>repeat<span class="property-type">number</span></dt>
+    <dd>Gets the value in seconds. It is specified how many seconds after the injection will take place.</dd>
+    <dt>crontab <span class="property-type">string</span></dt>
+    <dd>It is a valid crontime expression. If the <i>"repeat"</i> field is full, this field is not used.</dd>
+    <dt>crontiMethod <span class="property-type">string|number</span></dt>
+    <dd>
+        The methods supported by the <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> package.
+        The <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> package also uses the cronti package.
+        If the <i>"crontab"</i> field is full, this field is not used.
+        For detailed information <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> or <a href="https://www.npmjs.com/package You can refer to the package doc /cronjo" target="_blank">cronjo</a>.
+    </dd>
+    <dt>crontiArgs <span class="property-type">array</span></dt>
+    <dd>
+        The arguments to the methods supported by the <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> package.
+        The <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> package also uses the cronti package.
+        If the <i>"crontab"</i> field is full, this field is not used.
+        For detailed information <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> or <a href="https://www.npmjs.com/package You can refer to the package doc /cronjo" target="_blank">cronjo</a>.
+    </dd>
+</dl>
+<p>
+    <b>Note</b>: In this node's infrastructure <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> and <a href=" https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> packages are used.
+</p>
+<p>
+    <b>Note</b>: SCNT is short for "Scheduler Count". ST is short for "Start Time". ET is short for "End Time".
+</p>
+</script>

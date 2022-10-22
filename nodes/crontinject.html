@@ -1,15 +1,15 @@
 <!--
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
 -->
 
 <script type="text/html" data-template-name="crontinject">
@@ -38,10 +38,11 @@
             <option value="interval-time" >interval between times</option>
             <option value="time" >at a specific time</option>
             <option value="cronti-on-week" >week of date</option>
-            <option value="cronti-on-interval-time" >intervals two dates</option>
+            <option value="cronti-on-interval-time" >intervals between dates</option>
             <option value="cronti-on-time" >advanced</option>
             <option value="cronti-on-crontime" >crontime</option>
             <option value="cronti-on-date" >date</option>
+            <option value="msg" >msg</option>
         </select>
         <input type="hidden" id="node-input-repeat">
         <input type="hidden" id="node-input-crontab">
@@ -489,7 +490,7 @@
         }
         RED.nodes.registerType("crontinject", {
             category: 'common',
-            color: "#97c8eb",
+            color: "#937DC2",
             defaults: {
                 name: { value: "" },
                 props: {
@@ -536,9 +537,11 @@
                 payload: { value: "", validate: RED.validators.typedInput("payloadType", false) },
                 payloadType: { value: "date" },
                 crontiMethod: { value: "" },
-                crontiArgs: { value: "[]" }
+                crontiArgs: { value: "[]" },
+                inputs: { value: 0 },
+                hasButton: { value: true }
             },
-            icon: "inject.svg",
+            icon: "start_cog.svg",
             inputs: 0,
             outputs: 1,
             outputLabels: function(index) {
@@ -681,11 +684,7 @@
             oneditprepare: function() {
                 var node = this;
                 var payloadType = node.payloadType;
-                var type = $("#inject-time-type-select").val();
-                var isCronti = type.includes("cronti")
                 var crontiMonitor = $("#crontiMonitor")
-
-                isCronti ? crontiMonitor.show() : crontiMonitor.hide()
 
                 if(node.payloadType == null) {
                     if(node.payload == "") {
@@ -693,7 +692,7 @@
                     } else {
                         payloadType = "str";
                     }
-                } else if(node.payloadType === 'string' || node.payloadType === 'none') {
+                } else if(node.payloadType === 'string' || node.payloadType === 'none' || node.payloadType === "msg") {
                     payloadType = "str";
                 }
 
@@ -812,7 +811,9 @@
                 });
 
                 var repeattype = "none";
-                if(node.repeat != "" && node.repeat != 0) {
+                if(node.inputs) {
+                    repeattype = "msg";
+                } else if(node.repeat != "" && node.repeat != 0) {
                     repeattype = "interval";
                     var r = "s";
                     var c = node.repeat;
@@ -896,6 +897,16 @@
                 $("#inject-time-type-select").val(repeattype);
                 $("#inject-time-row-" + repeattype).show();
 
+                var isCronti = repeattype.includes("cronti")
+
+                isCronti ? crontiMonitor.show() : crontiMonitor.hide()
+
+                node.inputs = 0
+                node.hasButton = true
+                if(repeattype === "msg") {
+                    node.inputs = 1
+                    node.hasButton = false
+                }
                 /* */
 
                 var eList = $('#node-input-property-container').css('min-height', '120px').css('min-width', '450px');
@@ -988,13 +999,23 @@
 
             },
             oneditsave: function() {
+                var node = this
                 var repeat = "";
                 var crontab = "";
                 var crontiMethod = "";
                 var crontiArgs = "";
                 var type = $("#inject-time-type-select").val();
                 var isCronti = type.includes("cronti")
-                if(type == "none") {
+
+                node.inputs = 0
+                node.hasButton = true
+                if(type === "msg") {
+                    node.inputs = 1
+                    node.hasButton = false
+                }
+                node.inputs = type === "msg" ? 1 : 0
+
+                if(type === "none" || type === "msg") {
                     // nothing
                 } else if(type == "interval") {
                     var count = $("#inject-time-interval-count").val();
@@ -1109,6 +1130,9 @@
                 enabled: function() {
                     return !this.changed
                 },
+                visible: function() {
+                    return this.hasButton
+                },
                 onclick: function() {
                     if(this.changed) {
                         return RED.notify(RED._("notification.warning", { message: RED._("notification.warnings.undeployedChanges") }), "warning");
@@ -1121,29 +1145,3 @@
     })();
 </script>
 
-<script type="text/html" data-help-name="crontinject">
-    <p>Injects a message into a flow either manually or at regular intervals. The message
-    payload can be a variety of types, including strings, JavaScript objects or the current time.</p>
-    <h3>Outputs</h3>
-    <dl class="message-properties">
-        <dt>payload<span class="property-type">various</span></dt>
-        <dd>The configured payload of the message.</dd>
-        <dt class="optional">topic <span class="property-type">string</span></dt>
-        <dd>An optional property that can be configured in the node.</dd>
-    </dl>
-    <h3>Details</h3>
-    <p>The Inject node can initiate a flow with a specific payload value.
-    The default payload is a timestamp of the current time in millisecs since January 1st, 1970.</p>
-    <p>The node also supports injecting strings, numbers, booleans, JavaScript objects, or flow/global context values.</p>
-    <p>By default, the node is triggered manually by clicking on its button within the editor. It can also be set to
-    inject at regular intervals or according to a schedule.</p>
-    <p>It can also be configured to inject once each time the flows are started.</p>
-    <p>The maximum <i>Interval</i> that can be specified is about 596 hours / 24 days. However if you are looking at intervals
-    greater than one day you should consider using a scheduler node that can cope with power outages and restarts.</p>
-    <p><b>Note</b>: The <i>"Interval between times"</i> and <i>"at a specific time"</i> options use the standard cron system.
-    This means that 20 minutes will be at the next hour, 20 minutes past and 40 minutes past - not in 20 minutes time.
-    If you want every 20 minutes from now - use the <i>"interval"</i> option.</p>
-    <p><b>Note</b>: To include a newline in a string you must use a Function node to create the payload.</p>
-    <hr/>
-    <p>"week of date", "intervals to dates", "advanced", "crontime" and "date" features are prepared using <a href="https://www.npmjs.com/package/cronti" target="_blank">the cronti package</a>. Click on the cronti <a href="https://buglss.github.io/npm/cronti/" target="_blank">link</a> for detailed information.</p>
-    </script>

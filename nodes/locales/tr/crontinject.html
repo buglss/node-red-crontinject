@@ -1,0 +1,84 @@
+<!--
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+
+<script type="text/html" data-help-name="crontinject">
+<p>
+  Manuel veya planlı şekilde mesaj enjekte eder. Mesaj objesindeki payload alanı çeşitli tiplerde doldurulabilir.
+  Bunlar string olabilir, json olabilir veya şu anki zaman olabilir.
+  En az payload ve topic alanlarının doldurulması tavsiye edilir.
+</p>
+<h3>Çıktılar</h3>
+<dl class="message-properties">
+    <dt>payload<span class="property-type">any</span></dt>
+    <dd>Mesaj objesinin (msg) yük alanı.</dd>
+    <dt class="optional">topic <span class="property-type">string</span></dt>
+    <dd>Node'un konusunu ifade eden. Debug konsolu gibi noktalarda anılan değerdir.</dd>
+</dl>
+<h3>Detay</h3>
+<p>
+  Crontinject node'u belirli bir payload değeri ile başlatılabilir.
+  Varsayılan payload değeri şuan ki zamanın zaman damgasıdır.
+</p>
+<p>
+  Node farklı bir çok tipte enjeksiyon sonucu çıktı iletebilir. Bunlar string, number, boolean, json veya flow/global context olabilir.
+</p>
+<p>
+  Manuel tetikleme için node'un üzerindeki(solunda) butona basılır.
+  Tetikleme planlamak için node'un editör/düzenleme ekranındaki seçenekler kullanılır.
+</p>
+<p>
+  Flow her başladığında, örneğin "Deploy"a basıldığında veya sunucu start olduğunda bir kez çalışacak şekilde de ayarlanabilir.
+</p>
+<p>
+  <i>"none"</i> değeri seçildiğinde planlama kapatılmış olur.
+</p>
+<p>
+  Belirlenebilecek maksimum <i>"interval"</i> değeri 596 saattir(~24 gün).
+</p>
+<p>
+  <i>"interval between time"</i>, <i>"at a specific time"</i>, <i>"week of date"</i>, <i>"intervals between dates"</i>, <i>"advanced"</i>, <i>"crontime"</i> ve <i>"date"</i>
+  değerleri standart cron sistemini kullanır.
+</p>
+<p>
+  <i>"msg"</i> değeri seçildiğinde node'un tüm özellikleri mesaj objesindeki <i>"payload"</i> değerine göre dinamik bir şekilde ayarlanır.
+  <i>"payload"</i> değeri obje olarak gönderilmelidir.
+</p>
+<h3>Girdiler (msg)</h3>
+<dl class="message-properties">
+    <dt>repeat<span class="property-type">number</span></dt>
+    <dd>Saniye cinsinden değer alır. Enjeksiyonun ne kadar saniye sonra gerçekleşeceği belirtilir.</dd>
+    <dt>crontab <span class="property-type">string</span></dt>
+    <dd>Geçerli bir crontime ifadesidir. Eğer <i>"repeat"</i> alanı dolu ise bu alan kullanılmaz.</dd>
+    <dt>crontiMethod <span class="property-type">string|number</span></dt>
+    <dd>
+      <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> paketinin desteklediği metodlardır.
+      <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paketi de cronti paketini kullanır.
+      Eğer <i>"crontab"</i> alanı dolu ise bu alan kullanılmaz.
+      Detaylı bilgi için <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> veya <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paket dokümanına bakabilirsiniz.
+    </dd>
+    <dt>crontiArgs <span class="property-type">array</span></dt>
+    <dd>
+      <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> paketinin desteklediği metodlara ait argümanlardır.
+      <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paketi de cronti paketini kullanır.
+      Eğer <i>"crontab"</i> alanı dolu ise bu alan kullanılmaz.
+      Detaylı bilgi için <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> veya <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paket dokümanına bakabilirsiniz.
+    </dd>
+</dl>
+<p>
+  <b>Not</b>: Bu node'un altyapısında <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> ve <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paketleri kullanılmıştır.
+</p>
+<p>
+  <b>Not</b>: SCNT, "Scheduler Count" ifadesinin kısaltmasıdır. ST, "Start Time" ifadesinin kısaltmasıdır. ET, "End Time" ifadesinin kısaltmasıdır.
+</p>
+</script>
