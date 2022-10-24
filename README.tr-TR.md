@@ -18,7 +18,7 @@ Türkçe dil desteği bulunmaktadır.
 
 Detaylı bilgi için <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> veya <a href="https://www.npmjs.com/package You can refer to the package doc /cronjo" target="_blank">cronjo</a>.
 
-![crontinject](https://user-images.githubusercontent.com/16067517/197384061-f47ac90c-825b-4b2f-9ae9-0aac9a59642c.gif)
+![crontinject](https://user-images.githubusercontent.com/16067517/197639115-fdc1781e-68c0-4ea9-b21d-eb0dea1ec49b.gif)
 
 # Örnekler
 
