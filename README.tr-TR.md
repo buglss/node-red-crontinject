@@ -4,7 +4,7 @@
 ![nodejs](https://img.shields.io/badge/nodejs-43853d?logo=nodedotjs&labelColor=fff)
 ![npm](https://img.shields.io/badge/npm-bc2c32?logo=npm&labelColor=fff)
 ![javascript](https://img.shields.io/badge/javascript-e9d961?logo=javascript&labelColor=000)
-![node-red](https://img.shields.io/badge/nodejs-8F0000?logo=Node-RED&labelColor=8F0000)
+![node-red](https://img.shields.io/badge/node--red-8F0000?logo=Node-RED&labelColor=8F0000)
 [![License](https://img.shields.io/badge/License-Apache--2.0-red)](LICENSE)
 
 [![NPM](https://nodei.co/npm/@buglss/node-red-crontinject.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/@buglss/node-red-crontinject/)
