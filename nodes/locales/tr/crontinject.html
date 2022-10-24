@@ -18,14 +18,51 @@
   Bunlar string olabilir, json olabilir veya şu anki zaman olabilir.
   En az payload ve topic alanlarının doldurulması tavsiye edilir.
 </p>
+<p>
+  <code>msg</code> seçeneğinde job oluşturulduğu anda job ile ilgili bilgiler çıktı olarak gönderilir.
+  Bu şeçenek kullanılarak job oluşturulduğu anda job'a ait bilgilerin bulunduğu enjeksiyon gerçekleşir.
+  Çıktıdaki job bilgileri <code>msg.schedule</code> objesinde yer alır.
+  Çıktıdaki <code>msg.schedule.self._id</code> değeri ile job'ı iptal edebilirsiniz.
+</p>
 <h3>Çıktılar</h3>
 <dl class="message-properties">
     <dt>payload<span class="property-type">any</span></dt>
     <dd>Mesaj objesinin (msg) yük alanı.</dd>
-    <dt class="optional">topic <span class="property-type">string</span></dt>
+    <dt>topic <span class="property-type">string</span></dt>
     <dd>Node'un konusunu ifade eden. Debug konsolu gibi noktalarda anılan değerdir.</dd>
+    <dt>schedule<span class="property-type">object</span></dt>
+    <dd>Zamanlanmış iş bilgilerinin yer aldığı objedir.</dd>
+    <dt>schedule.cancel<span class="property-type">boolean</span></dt>
+    <dd>Zamanlanmış işin iptal durumunu belirtir. true ise iptal, false ise oluşturma işlemidir.</dd>
+    <dt>schedule.list<span class="property-type">array</span></dt>
+    <dd>Zamanlanmış işlerin listesidir.</dd>
+    <dt>schedule.self<span class="property-type">object</span></dt>
+    <dd>Zamanlanmış işin kendisidir.</dd>
 </dl>
-<h3>Detay</h3>
+<h3>Girdiler (msg)</h3>
+<dl class="message-properties">
+    <dt>_id<span class="property-type">number</span></dt>
+    <dd>Zamanlanmış işin id numarasıdır. Bu değer doldurulduğunda iptal işlemi gerçekleştirilir. Diğer parametrelere bakılmaz.</dd>
+    <dt>repeat<span class="property-type">number</span></dt>
+    <dd>Saniye cinsinden değer alır. Enjeksiyonun ne kadar saniye sonra gerçekleşeceği belirtilir.</dd>
+    <dt>crontab <span class="property-type">string</span></dt>
+    <dd>Geçerli bir crontime ifadesidir. Eğer <i>"repeat"</i> alanı dolu ise bu alan kullanılmaz.</dd>
+    <dt>crontiMethod <span class="property-type">string|number</span></dt>
+    <dd>
+      <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> paketinin desteklediği metodlardır.
+      <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paketi de cronti paketini kullanır.
+      Eğer <i>"crontab"</i> alanı dolu ise bu alan kullanılmaz.
+      Detaylı bilgi için <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> veya <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paket dokümanına bakabilirsiniz.
+    </dd>
+    <dt>crontiArgs <span class="property-type">array</span></dt>
+    <dd>
+      <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> paketinin desteklediği metodlara ait argümanlardır.
+      <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paketi de cronti paketini kullanır.
+      Eğer <i>"crontab"</i> alanı dolu ise bu alan kullanılmaz.
+      Detaylı bilgi için <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> veya <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paket dokümanına bakabilirsiniz.
+    </dd>
+</dl>
+<h3>Detaylar</h3>
 <p>
   Crontinject node'u belirli bir payload değeri ile başlatılabilir.
   Varsayılan payload değeri şuan ki zamanın zaman damgasıdır.
@@ -54,27 +91,6 @@
   <i>"msg"</i> değeri seçildiğinde node'un tüm özellikleri mesaj objesindeki <i>"payload"</i> değerine göre dinamik bir şekilde ayarlanır.
   <i>"payload"</i> değeri obje olarak gönderilmelidir.
 </p>
-<h3>Girdiler (msg)</h3>
-<dl class="message-properties">
-    <dt>repeat<span class="property-type">number</span></dt>
-    <dd>Saniye cinsinden değer alır. Enjeksiyonun ne kadar saniye sonra gerçekleşeceği belirtilir.</dd>
-    <dt>crontab <span class="property-type">string</span></dt>
-    <dd>Geçerli bir crontime ifadesidir. Eğer <i>"repeat"</i> alanı dolu ise bu alan kullanılmaz.</dd>
-    <dt>crontiMethod <span class="property-type">string|number</span></dt>
-    <dd>
-      <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> paketinin desteklediği metodlardır.
-      <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paketi de cronti paketini kullanır.
-      Eğer <i>"crontab"</i> alanı dolu ise bu alan kullanılmaz.
-      Detaylı bilgi için <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> veya <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paket dokümanına bakabilirsiniz.
-    </dd>
-    <dt>crontiArgs <span class="property-type">array</span></dt>
-    <dd>
-      <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> paketinin desteklediği metodlara ait argümanlardır.
-      <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paketi de cronti paketini kullanır.
-      Eğer <i>"crontab"</i> alanı dolu ise bu alan kullanılmaz.
-      Detaylı bilgi için <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> veya <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paket dokümanına bakabilirsiniz.
-    </dd>
-</dl>
 <p>
   <b>Not</b>: Bu node'un altyapısında <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> ve <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paketleri kullanılmıştır.
 </p>

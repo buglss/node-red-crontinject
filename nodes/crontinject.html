@@ -710,7 +710,7 @@
                         crontiMonitor.html('<div id="loading"></div>')
                         delayTimer = setTimeout(function() {
                             $.ajax({
-                                url: "/cronjo/next-dates",
+                                url: "cronjo/next-dates",
                                 data: JSON.stringify({ method, args }),
                                 method: "POST",
                                 contentType: "application/json; charset=utf-8",

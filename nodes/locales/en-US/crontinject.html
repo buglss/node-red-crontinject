@@ -18,12 +18,49 @@
     These can be strings, json, or current time.
     It is recommended to fill at least the payload and topic fields.
 </p>
+<p>
+    As soon as the job is created in the <code>msg</code> option, information about the job is sent as output.
+    As soon as the job is created using this option, the injection containing the information about the job takes place.
+    The job information in the output is contained in the <code>msg.schedule</code> object.
+    You can cancel the job with <code>msg.schedule.self._id</code> in the output.
+</p>
 <h3>Outputs</h3>
 <dl class="message-properties">
     <dt>payload<span class="property-type">any</span></dt>
     <dd>The payload area of the message object (msg).</dd>
-    <dt class="optional">topic <span class="property-type">string</span></dt>
+    <dt>topic <span class="property-type">string</span></dt>
     <dd>Expressing the subject of the Node. It is the value referred to in points such as the Debug console.</dd>
+    <dt>schedule<span class="property-type">object</span></dt>
+    <dd>It is the object that contains the scheduled job information.</dd>
+    <dt>schedule.cancel<span class="property-type">boolean</span></dt>
+    <dd>Indicates the cancellation status of the scheduled job. If true, it is cancel, if false, it is creation.</dd>
+    <dt>schedule.list<span class="property-type">array</span></dt>
+    <dd>It is a list of scheduled jobs.</dd>
+    <dt>schedule.self<span class="property-type">object</span></dt>
+    <dd>It is the scheduled job itself.</dd>
+</dl>
+<h3>Inputs (msg)</h3>
+<dl class="message-properties">
+    <dt>_id<span class="property-type">number</span></dt>
+    <dd>The id of the scheduled job. When this value is filled, cancellation is performed. Other parameters is ignored.</dd>
+    <dt>repeat<span class="property-type">number</span></dt>
+    <dd>Gets the value in seconds. It is specified how many seconds after the injection will take place.</dd>
+    <dt>crontab <span class="property-type">string</span></dt>
+    <dd>It is a valid crontime expression. If the <i>"repeat"</i> field is full, this field is not used.</dd>
+    <dt>crontiMethod <span class="property-type">string|number</span></dt>
+    <dd>
+        The methods supported by the <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> package.
+        The <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> package also uses the cronti package.
+        If the <i>"crontab"</i> field is full, this field is not used.
+        For detailed information <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> or <a href="https://www.npmjs.com/package You can refer to the package doc /cronjo" target="_blank">cronjo</a>.
+    </dd>
+    <dt>crontiArgs <span class="property-type">array</span></dt>
+    <dd>
+        The arguments to the methods supported by the <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> package.
+        The <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> package also uses the cronti package.
+        If the <i>"crontab"</i> field is full, this field is not used.
+        For detailed information <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> or <a href="https://www.npmjs.com/package You can refer to the package doc /cronjo" target="_blank">cronjo</a>.
+    </dd>
 </dl>
 <h3>Details</h3>
 <p>
@@ -54,27 +91,6 @@
     When <i>"msg"</i> is selected, all properties of the node are dynamically set according to the <i>"payload"</i> value in the message object.
     The value <i>"payload"</i> must be sent as an object.
 </p>
-<h3>Inputs (msg)</h3>
-<dl class="message-properties">
-    <dt>repeat<span class="property-type">number</span></dt>
-    <dd>Gets the value in seconds. It is specified how many seconds after the injection will take place.</dd>
-    <dt>crontab <span class="property-type">string</span></dt>
-    <dd>It is a valid crontime expression. If the <i>"repeat"</i> field is full, this field is not used.</dd>
-    <dt>crontiMethod <span class="property-type">string|number</span></dt>
-    <dd>
-        The methods supported by the <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> package.
-        The <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> package also uses the cronti package.
-        If the <i>"crontab"</i> field is full, this field is not used.
-        For detailed information <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> or <a href="https://www.npmjs.com/package You can refer to the package doc /cronjo" target="_blank">cronjo</a>.
-    </dd>
-    <dt>crontiArgs <span class="property-type">array</span></dt>
-    <dd>
-        The arguments to the methods supported by the <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> package.
-        The <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> package also uses the cronti package.
-        If the <i>"crontab"</i> field is full, this field is not used.
-        For detailed information <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> or <a href="https://www.npmjs.com/package You can refer to the package doc /cronjo" target="_blank">cronjo</a>.
-    </dd>
-</dl>
 <p>
     <b>Note</b>: In this node's infrastructure <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> and <a href=" https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> packages are used.
 </p>
