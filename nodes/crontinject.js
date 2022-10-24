@@ -75,7 +75,13 @@ module.exports = function(RED) {
             delete node.repeat;
         }
 
-        node.repeaterSetup = function(context = this) {
+        node.repeaterSetup = function(context = this, msg = {}) {
+            Object.defineProperties(msg, {
+                __send__: {
+                    value: true
+                }
+            });
+
             if(context.repeat > 2147483) {
                 node.error("Interval too large", {});
                 return
@@ -83,19 +89,18 @@ module.exports = function(RED) {
 
             repeaters[node.id] = repeaters[node.id] || []
 
-
             node.status({ fill: "green", shape: "dot", text: (context.inputs ? "msg" : "none") + " (SCNT:" + repeaters[node.id].length + ")" });
             if(context.repeat && !isNaN(context.repeat) && context.repeat > 0) {
                 context.repeat = context.repeat * 1000;
                 node.debug("repeat = " + context.repeat);
                 context.interval_id = setInterval(function() {
-                    node.emit("input", {});
+                    node.emit("input", msg);
                 }, context.repeat);
                 repeaters[node.id].push({ interval_id: context.interval_id })
                 node.status({ fill: "green", shape: "dot", text: context.repeat + " (SCNT:" + repeaters[node.id].length + ")" });
             } else if(context.crontab) {
                 node.debug("crontab = " + context.crontab);
-                context.cronjob = cronjo(() => { node.emit("input", {}) }, context.crontab)
+                context.cronjob = cronjo(() => { node.emit("input", msg) }, context.crontab)
                 repeaters[node.id].push({ cronjob: context.cronjob })
                 node.status({ fill: "green", shape: "dot", text: context.crontab + " (" + context.cronjob.fireDate().toLocaleString() + ")" + " (SCNT:" + repeaters[node.id].length + ")" });
             } else if(context.crontiMethod) {
@@ -116,7 +121,7 @@ module.exports = function(RED) {
                                     return
                                 }
                             }
-                            node.emit("input", {})
+                            node.emit("input", msg)
                         }
                     }, ...crontiArgs)
                     repeaters[node.id].push({ cronjob: context.cronjob })
@@ -181,8 +186,8 @@ module.exports = function(RED) {
             if(errors.length) {
                 done(errors.join('; '));
             } else {
-                if(payload) {
-                    this.repeaterSetup(payload)
+                if(payload && !msg.__send__) {
+                    this.repeaterSetup(payload, msg)
                 } else {
                     send(msg);
                     done();
