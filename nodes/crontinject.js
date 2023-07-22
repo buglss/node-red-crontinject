@@ -142,15 +142,11 @@ module.exports = function(RED) {
         };
 
         if(this.once) {
-            const repeaterId = new Date().getTime()
             this.onceTimeout = setTimeout(function() {
                 node.emit("input", {});
-                node.repeaterSetup();
             }, this.onceDelay);
-            repeaters[node.id].push({ _id: repeaterId, onceTimeout: this.onceTimeout })
-        } else {
-            node.repeaterSetup();
         }
+        node.repeaterSetup();
 
         this.on("input", function(msg, send, done) {
             let errors = [];
