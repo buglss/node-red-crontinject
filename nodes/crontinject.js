@@ -15,7 +15,6 @@
 module.exports = function(RED) {
     "use strict";
     const cronjo = require("cronjo")
-    let repeaters = {}
 
     function InjectNode(n) {
         RED.nodes.createNode(this, n);
@@ -62,7 +61,8 @@ module.exports = function(RED) {
             delete node.repeat;
         }
 
-        repeaters[node.id] = repeaters[node.id] || []
+        node.__repeaters__ = node.__repeaters__ || {}
+        node.__repeaters__[node.id] = node.__repeaters__[node.id] || []
 
         node.repeaterSetup = function(context = this, msg = {}) {
             const repeaterId = new Date().getTime()
@@ -78,20 +78,20 @@ module.exports = function(RED) {
                 return
             }
 
-            node.status({ fill: "green", shape: "dot", text: (context.inputs ? "msg" : "none") + " (SCNT:" + repeaters[node.id].length + ")" });
+            node.status({ fill: "green", shape: "dot", text: (context.inputs ? "msg" : "none") + " (SCNT:" + node.__repeaters__[node.id].length + ")" });
             if(context.repeat && !isNaN(context.repeat) && context.repeat > 0) {
                 context.repeat = context.repeat * 1000;
                 node.debug("repeat = " + context.repeat);
                 context.interval_id = setInterval(function() {
                     node.emit("input", msg);
                 }, context.repeat);
-                repeaters[node.id].push({ _id: repeaterId, interval_id: context.interval_id })
-                node.status({ fill: "green", shape: "dot", text: context.repeat + " (SCNT:" + repeaters[node.id].length + ")" });
+                node.__repeaters__[node.id].push({ _id: repeaterId, interval_id: context.interval_id })
+                node.status({ fill: "green", shape: "dot", text: context.repeat + " (SCNT:" + node.__repeaters__[node.id].length + ")" });
             } else if(context.crontab) {
                 node.debug("crontab = " + context.crontab);
                 context.cronjob = cronjo(() => { node.emit("input", msg) }, context.crontab)
-                repeaters[node.id].push({ _id: repeaterId, cronjob: context.cronjob })
-                node.status({ fill: "green", shape: "dot", text: context.crontab + " (" + context.cronjob.fireDate().toLocaleString() + ")" + " (SCNT:" + repeaters[node.id].length + ")" });
+                node.__repeaters__[node.id].push({ _id: repeaterId, cronjob: context.cronjob })
+                node.status({ fill: "green", shape: "dot", text: context.crontab + " (" + context.cronjob.fireDate().toLocaleString() + ")" + " (SCNT:" + node.__repeaters__[node.id].length + ")" });
             } else if(context.crontiMethod) {
                 try {
                     let crontiArgs = context.crontiArgs
@@ -113,19 +113,19 @@ module.exports = function(RED) {
                             node.emit("input", msg)
                         }
                     }, ...crontiArgs)
-                    repeaters[node.id].push({ _id: repeaterId, cronjob: context.cronjob })
+                    node.__repeaters__[node.id].push({ _id: repeaterId, cronjob: context.cronjob })
                     let crontime = context.cronjob.expression
                     node.debug("crontab = " + crontime);
                     let dateText = ""
                     if(context.crontiMethod === "onIntervalTime") {
                         dateText = "ST:" + new Date(crontiArgs[0]).toLocaleString() + " | ET:" + new Date(crontiArgs[1]).toLocaleString()
                     }
-                    node.status({ fill: "green", shape: "dot", text: crontime + " (" + context.cronjob.fireDate().toLocaleString() + ")" + (dateText ? (" | " + dateText) : "") + " (SCNT:" + repeaters[node.id].length + ")" });
+                    node.status({ fill: "green", shape: "dot", text: crontime + " (" + context.cronjob.fireDate().toLocaleString() + ")" + (dateText ? (" | " + dateText) : "") + " (SCNT:" + node.__repeaters__[node.id].length + ")" });
                 } catch(error) {
                     node.error(error, {})
                 }
             }
-            return repeaters[node.id]
+            return node.__repeaters__[node.id]
         };
 
         if(this.once) {
@@ -163,10 +163,10 @@ module.exports = function(RED) {
                 if(payload && !msg.__send__) {
                     if(payload._id) {
                         // Cancel Schedule
-                        let index = repeaters[this.id].findIndex(r => r._id === payload._id)
-                        let repeater = repeaters[this.id][index]
+                        let index = node.__repeaters__[this.id].findIndex(r => r._id === payload._id)
+                        let repeater = node.__repeaters__[this.id][index]
 
-                        if(!repeater) node.status({ fill: "red", shape: "dot", text: repeater + " (SCNT:" + repeaters[this.id].length + ")" });
+                        if(!repeater) node.status({ fill: "red", shape: "dot", text: repeater + " (SCNT:" + node.__repeaters__[this.id].length + ")" });
                         else {
                             if(repeater.interval_id != null) {
                                 clearInterval(repeater.interval_id);
@@ -175,9 +175,9 @@ module.exports = function(RED) {
                                 repeater.cronjob.cancel();
                                 delete this.cronjob;
                             }
-                            repeaters[this.id].splice(index, 1)
-                            node.status({ fill: "yellow", shape: "dot", text: repeater._id + " (SCNT:" + repeaters[this.id].length + ")" });
-                            msg.schedule = { cancel: true, list: repeaters[this.id], self: repeater }
+                            node.__repeaters__[this.id].splice(index, 1)
+                            node.status({ fill: "yellow", shape: "dot", text: repeater._id + " (SCNT:" + node.__repeaters__[this.id].length + ")" });
+                            msg.schedule = { cancel: true, list: node.__repeaters__[this.id], self: repeater }
                         }
                     } else {
                         // Create Schedule
@@ -198,7 +198,7 @@ module.exports = function(RED) {
     RED.nodes.registerType("crontinject", InjectNode);
 
     InjectNode.prototype.close = function() {
-        repeaters[this.id].forEach(repeater => {
+        this.__repeaters__[this.id].forEach(repeater => {
             if(repeater.onceTimeout) {
                 clearTimeout(repeater.onceTimeout);
                 delete this.onceTimeout;
@@ -211,7 +211,7 @@ module.exports = function(RED) {
                 delete this.cronjob;
             }
         })
-        delete repeaters[this.id]
+        delete this.__repeaters__[this.id]
     };
 
     RED.httpAdmin.post("/inject/:id", RED.auth.needsPermission("inject.write"), function(req, res) {
