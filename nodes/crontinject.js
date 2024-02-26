@@ -57,19 +57,6 @@ module.exports = function(RED) {
         this.cronjob = null;
         let node = this;
 
-        node.props.forEach(function(prop) {
-            if(prop.vt === "jsonata") {
-                try {
-                    let val = prop.v ? prop.v : "";
-                    prop.exp = RED.util.prepareJSONataExpression(val, node);
-                }
-                catch(err) {
-                    node.error("Invalid JSONata expression: " + err.message, {});
-                    prop.exp = null;
-                }
-            }
-        });
-
         if(node.repeat > 2147483) {
             node.error("Interval too large", {});
             delete node.repeat;
@@ -163,18 +150,6 @@ module.exports = function(RED) {
 
                 if(!property) return;
 
-                if(valueType === "jsonata") {
-                    if(p.exp) {
-                        try {
-                            let val = RED.util.evaluateJSONataExpression(p.exp, msg);
-                            RED.util.setMessageProperty(msg, property, val, true);
-                        }
-                        catch(err) {
-                            errors.push(err.message);
-                        }
-                    }
-                    return;
-                }
                 try {
                     RED.util.setMessageProperty(msg, property, RED.util.evaluateNodeProperty(value, valueType, this, msg), true);
                 } catch(err) {

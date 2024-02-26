@@ -501,11 +501,6 @@
                                 if(!RED.utils.validatePropertyExpression(v[i].v)) {
                                     return "msg." + v[i].p + ": invalid property expression: " + v[i].v;
                                 }
-                            } else if(v[i].vt === "jsonata") {
-                                try { jsonata(v[i].v); }
-                                catch(e) {
-                                    return "msg." + v[i].p + ": invalid property expression: " + e.message
-                                }
                             } else if(v[i].vt === "json") {
                                 try { JSON.parse(v[i].v); }
                                 catch(e) {
@@ -947,7 +942,7 @@
                         var propertyValue = $('<input/>', { class: "node-input-prop-property-value", type: "text" })
                             .css("width", "calc(70% - 30px)")
                             .appendTo(row)
-                            .typedInput({ default: prop.vt || 'str', types: ['flow', 'global', 'str', 'num', 'bool', 'json', 'bin', 'date', 'jsonata', 'env', 'msg'] });
+                            .typedInput({ default: prop.vt || 'str', types: ['flow', 'global', 'str', 'num', 'bool', 'json', 'bin', 'date', 'env', 'msg'] });
 
                         propertyName.typedInput('value', prop.p);
                         propertyValue.typedInput('value', prop.v);
