@@ -39,7 +39,7 @@
     <dt>schedule.self<span class="property-type">object</span></dt>
     <dd>It is the scheduled job itself.</dd>
 </dl>
-<h3>Inputs (msg)</h3>
+<h3>Inputs (msg.payload)</h3>
 <dl class="message-properties">
     <dt>_id<span class="property-type">number</span></dt>
     <dd>The id of the scheduled job. When this value is filled, cancellation is performed. Other parameters is ignored.</dd>
@@ -49,7 +49,8 @@
     <dd>It is a valid crontime expression. If the <i>"repeat"</i> field is full, this field is not used.</dd>
     <dt>crontiMethod <span class="property-type">string|number</span></dt>
     <dd>
-        The methods supported by the <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> package.
+        count and units values ​​for the "interval" method; count, startTime, endTime and days values ​​for the "interval-time" method; For the "time" method, time and days values ​​can be used.
+        Additionally the methods supported by the <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> package.
         The <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> package also uses the cronti package.
         If the <i>"crontab"</i> field is full, this field is not used.
         For detailed information <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> or <a href="https://www.npmjs.com/package You can refer to the package doc /cronjo" target="_blank">cronjo</a>.
