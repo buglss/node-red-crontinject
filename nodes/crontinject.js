@@ -94,33 +94,139 @@ module.exports = function(RED) {
                 node.status({ fill: "green", shape: "dot", text: context.crontab + " (" + context.cronjob.fireDate().toLocaleString() + ")" + " (SCNT:" + node.__repeaters__[node.id].length + ")" });
             } else if(context.crontiMethod) {
                 try {
-                    let crontiArgs = context.crontiArgs
-                    try { crontiArgs = JSON.parse(crontiArgs) } catch(error) { /* Silent is gold */ }
-                    context.cronjob = cronjo({
-                        method: context.crontiMethod,
-                        job() {
-                            if(node.crontiMethod === "onIntervalTime") {
-                                let startDate = new Date(crontiArgs[0])
-                                let endDate = new Date(crontiArgs[1])
-                                if(new Date() >= endDate) {
-                                    node.cronjob.cancel();
-                                    delete node.cronjob;
-                                    return
-                                } else if(new Date <= startDate) {
-                                    return
-                                }
+                    if(context.crontiMethod === "interval") {
+                        let repeat = "";
+                        let count = context.count;
+                        let units = context.units;
+                        if(units == "s") {
+                            repeat = count;
+                        } else {
+                            if(units == "m") {
+                                //crontab = "*/"+count+" * * * "+days;
+                                repeat = count * 60;
+                            } else if(units == "h") {
+                                //crontab = "0 */"+count+" * * "+days;
+                                repeat = count * 60 * 60;
                             }
-                            node.emit("input", msg)
                         }
-                    }, ...crontiArgs)
-                    node.__repeaters__[node.id].push({ _id: repeaterId, cronjob: context.cronjob })
-                    let crontime = context.cronjob.expression
-                    node.debug("crontab = " + crontime);
-                    let dateText = ""
-                    if(context.crontiMethod === "onIntervalTime") {
-                        dateText = "ST:" + new Date(crontiArgs[0]).toLocaleString() + " | ET:" + new Date(crontiArgs[1]).toLocaleString()
+                        if(repeat && !isNaN(repeat) && repeat > 0) {
+                            repeat = repeat * 1000;
+                            node.debug("repeat = " + repeat);
+                            context.interval_id = setInterval(function() {
+                                node.emit("input", msg);
+                            }, repeat);
+                            node.__repeaters__[node.id].push({ _id: repeaterId, interval_id: context.interval_id })
+                            node.status({ fill: "green", shape: "dot", text: repeat + " (SCNT:" + node.__repeaters__[node.id].length + ")" });
+                        } else {
+                            node.status({ fill: "red", shape: "dot", text: "Repeat:" + repeat });
+                        }
+                    } else if(context.crontiMethod === "interval-time") {
+                        let crontab = "";
+                        let count = context.count;
+                        let startTime = Number(context.startTime);
+                        let endTime = Number(context.endTime);
+                        let days = context.days;
+                        if(days.length == 0) {
+                            crontab = "";
+                        } else {
+                            if(days.length == 7) {
+                                days = "*";
+                            } else {
+                                days = days.join(",");
+                            }
+                            let timerange = "";
+                            if(endTime == 0) {
+                                timerange = startTime + "-23";
+                            } else if(startTime + 1 < endTime) {
+                                timerange = startTime + "-" + (endTime - 1);
+                            } else if(startTime + 1 == endTime) {
+                                timerange = startTime;
+                            } else {
+                                let startpart = "";
+                                let endpart = "";
+                                if(startTime == 23) {
+                                    startpart = "23";
+                                } else {
+                                    startpart = startTime + "-23";
+                                }
+                                if(endTime == 1) {
+                                    endpart = "0";
+                                } else {
+                                    endpart = "0-" + (endTime - 1);
+                                }
+                                timerange = startpart + "," + endpart;
+                            }
+                            if(count === "0") {
+                                crontab = count + " " + timerange + " * * " + days;
+                            } else {
+                                crontab = "*/" + count + " " + timerange + " * * " + days;
+                            }
+                        }
+                        if(crontab) {
+                            node.debug("crontab = " + crontab);
+                            context.cronjob = cronjo(() => { node.emit("input", msg) }, crontab)
+                            node.__repeaters__[node.id].push({ _id: repeaterId, cronjob: context.cronjob })
+                            node.status({ fill: "green", shape: "dot", text: crontab + " (" + context.cronjob.fireDate().toLocaleString() + ")" + " (SCNT:" + node.__repeaters__[node.id].length + ")" });
+                        } else {
+                            node.status({ fill: "red", shape: "dot", text: "Crontab:" + crontab });
+                        }
+                    } else if(context.crontiMethod === "time") {
+                        let crontab = "";
+                        let time = context.time;
+                        let days = context.days;
+                        if(days.length == 0) {
+                            crontab = "";
+                        } else {
+                            if(days.length == 7) {
+                                days = "*";
+                            } else {
+                                days = days.join(",");
+                            }
+                            let parts = time.split(":");
+                            if(parts.length === 2) {
+                                parts[1] = ("00" + (parseInt(parts[1]) % 60)).substr(-2);
+                                parts[0] = ("00" + (parseInt(parts[0]) % 24)).substr(-2);
+                                crontab = parts[1] + " " + parts[0] + " * * " + days;
+                            }
+                            else { crontab = ""; }
+                        }
+                        if(crontab) {
+                            node.debug("crontab = " + crontab);
+                            context.cronjob = cronjo(() => { node.emit("input", msg) }, crontab)
+                            node.__repeaters__[node.id].push({ _id: repeaterId, cronjob: context.cronjob })
+                            node.status({ fill: "green", shape: "dot", text: crontab + " (" + context.cronjob.fireDate().toLocaleString() + ")" + " (SCNT:" + node.__repeaters__[node.id].length + ")" });
+                        } else {
+                            node.status({ fill: "red", shape: "dot", text: "Crontab:" + crontab });
+                        }
+                    } else {
+                        let crontiArgs = context.crontiArgs
+                        try { crontiArgs = JSON.parse(crontiArgs) } catch(error) { /* Silent is gold */ }
+                        context.cronjob = cronjo({
+                            method: context.crontiMethod,
+                            job() {
+                                if(node.crontiMethod === "onIntervalTime") {
+                                    let startDate = new Date(crontiArgs[0])
+                                    let endDate = new Date(crontiArgs[1])
+                                    if(new Date() >= endDate) {
+                                        node.cronjob.cancel();
+                                        delete node.cronjob;
+                                        return
+                                    } else if(new Date <= startDate) {
+                                        return
+                                    }
+                                }
+                                node.emit("input", msg)
+                            }
+                        }, ...crontiArgs)
+                        node.__repeaters__[node.id].push({ _id: repeaterId, cronjob: context.cronjob })
+                        let crontime = context.cronjob.expression
+                        node.debug("crontab = " + crontime);
+                        let dateText = ""
+                        if(context.crontiMethod === "onIntervalTime") {
+                            dateText = "ST:" + new Date(crontiArgs[0]).toLocaleString() + " | ET:" + new Date(crontiArgs[1]).toLocaleString()
+                        }
+                        node.status({ fill: "green", shape: "dot", text: crontime + " (" + context.cronjob.fireDate().toLocaleString() + ")" + (dateText ? (" | " + dateText) : "") + " (SCNT:" + node.__repeaters__[node.id].length + ")" });
                     }
-                    node.status({ fill: "green", shape: "dot", text: crontime + " (" + context.cronjob.fireDate().toLocaleString() + ")" + (dateText ? (" | " + dateText) : "") + " (SCNT:" + node.__repeaters__[node.id].length + ")" });
                 } catch(error) {
                     node.error(error, {})
                 }

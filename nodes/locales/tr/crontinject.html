@@ -39,7 +39,7 @@
     <dt>schedule.self<span class="property-type">object</span></dt>
     <dd>Zamanlanmış işin kendisidir.</dd>
 </dl>
-<h3>Girdiler (msg)</h3>
+<h3>Girdiler (msg.payload)</h3>
 <dl class="message-properties">
     <dt>_id<span class="property-type">number</span></dt>
     <dd>Zamanlanmış işin id numarasıdır. Bu değer doldurulduğunda iptal işlemi gerçekleştirilir. Diğer parametrelere bakılmaz.</dd>
@@ -49,7 +49,8 @@
     <dd>Geçerli bir crontime ifadesidir. Eğer <i>"repeat"</i> alanı dolu ise bu alan kullanılmaz.</dd>
     <dt>crontiMethod <span class="property-type">string|number</span></dt>
     <dd>
-      <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> paketinin desteklediği metodlardır.
+      "interval" metodu için count ve units değerleri; "interval-time" metodu için count, startTime, endTime ve days değerleri; "time" metodu için ise time ve days değerleri kullanılabilir.
+      Bunlara ek olarak <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> paketinin desteklediği metodlardır.
       <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paketi de cronti paketini kullanır.
       Eğer <i>"crontab"</i> alanı dolu ise bu alan kullanılmaz.
       Detaylı bilgi için <a href="https://www.npmjs.com/package/cronti" target="_blank">cronti</a> veya <a href="https://www.npmjs.com/package/cronjo" target="_blank">cronjo</a> paket dokümanına bakabilirsiniz.
